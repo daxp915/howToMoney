@@ -1,0 +1,14 @@
+# Local development overlay. Publishes ports on the loopback interface only, so
+# the app and database are reachable from this machine and nowhere else on the
+# LAN.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+services:
+  db:
+    ports:
+      # Lets host-run npm scripts (migrate, seed, sync) reach the database.
+      - '127.0.0.1:${DB_PORT:-5432}:5432'
+
+  web:
+    ports:
+      - '127.0.0.1:3000:3000'

@@ -1,0 +1,1331 @@
+/* ============================================================================
+   Design tokens -- HTMFD v2.
+
+   The single source of truth for colour, type and spacing: do not invent a
+   value downstream. Light is the default; dark is the same names redefined twice
+   below -- once for the OS setting, once for an explicit data-theme="dark" --
+   and a token added to one dark block and not the other gives forced-dark
+   users the light value.
+
+   Colour has four jobs and they do not lend to each other:
+   - one accent (indigo): actions, links, active state, focus, review dots;
+   - status (--ok / --watch / --over): on track, watch, over -- nothing else;
+   - data (--money-in teal, --money-out grey): money in and money out only;
+   - everything else is neutral ink, and stacked bars use --series-1..4.
+
+   Below the v2 block sits a legacy layer: the Organic system's token names
+   pointed at their v2 equivalents, so a page not yet rebuilt renders in the
+   new palette and face instead of the old one. It is scaffolding. Each screen
+   rebuilt on v2 should use the v2 names, and the layer goes when nothing
+   reads it.
+   ========================================================================= */
+
+/* Self-hosted, not a CDN link: the NAS may have no route to
+   fonts.googleapis.com, and a blocked font stylesheet silently renders the app
+   in the system face. Geist is the variable file from the `geist` npm package
+   (SIL OFL, see static/fonts/OFL-geist.txt): one file answers 400, 500 and
+   600. Geist Mono is used for one thing only, a bank's raw descriptor. */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/geist-variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/geist-mono-regular.woff2') format('woff2');
+}
+
+:root {
+  color-scheme: light;
+
+  /* ---- type ---- */
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --fs-hero-desktop: 56px; /* Home/Wealth hero on desktop */
+  --fs-hero: 44px; /* default hero; 48px on Activity/Plan/Goals desktop */
+  --fs-hero-phone: 40px; /* 36px on Activity/Plan/Goals phone */
+  --fs-detail-amount: 40px; /* detail panel / sheet amount */
+  --fs-title: 28px; /* page title */
+  --fs-row-strong: 20px; /* detail merchant name */
+  --fs-body: 16px; /* rows, inputs -- never below 16 on inputs */
+  --fs-small: 15px;
+  --fs-meta: 14px;
+  --fs-caption: 13px;
+  --fs-label: 12px; /* section label: 600, .09em, uppercase */
+  --fw-regular: 400;
+  --fw-figure: 500; /* every money figure, always tabular-nums */
+  --fw-strong: 600;
+  --ls-hero: -0.02em;
+  --ls-title: -0.01em;
+  --ls-label: 0.09em;
+
+  /* ---- shape and space ---- */
+  --r-card: 18px;
+  --r-tile: 14px;
+  --r-field: 12px;
+  --r-input-amount: 10px;
+  --r-phone-sheet: 28px;
+  --r-pill: 999px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 40px;
+  --space-7: 56px; /* not in the handoff: the old scale's last step, kept for page bottoms */
+  --row-min: 52px;
+  --hit-min: 44px;
+  --bar-h: 6px; /* category bars; 8px goal bars; 10-14px hero/stacked bars */
+  --content-max: 1200px;
+  --rail-w: 400px; /* desktop right column / detail panel (380 on Activity) */
+  --advisor-w: 460px;
+  --topbar-h: 72px;
+
+  /* ---- light ---- */
+  --bg: #f5f5f3;
+  --surface: #ffffff;
+  --surface-sheet: #ffffff;
+  --sheet-card: var(--bg); /* a card inside a sheet (Customize Home) */
+  --panel: #fbfbfa; /* advisor panel */
+  --line: #e6e6e2;
+  --ink: #141518;
+  --ink-2: #55575e; /* secondary text, >=7:1 */
+  /* labels and captions. #6f7178 was 4.87:1 on a card but 4.47:1 on --bg,
+     where every section label sits; axe flagged it. 4.73:1 on --bg now. */
+  --ink-3: #6b6d74;
+  --pill: #f0f0ed; /* category pill, chip and tile background */
+  --track: #ececea; /* empty bar track, disabled button */
+  --field: #f5f5f3; /* input background inside cards */
+  --grip: #d4d5d9;
+  --toggle-off: #d4d5d9;
+  --scrim: rgba(20, 21, 24, 0.35);
+  --shadow: 0 1px 2px rgba(20, 21, 24, 0.05), 0 8px 24px rgba(20, 21, 24, 0.06);
+  --nav-on: #141518; /* active nav pill, selected period segment */
+  --nav-on-ink: #ffffff;
+
+  --accent: oklch(0.52 0.19 272); /* indigo */
+  --accent-ink: #ffffff; /* text on accent */
+  --accent-text: oklch(0.48 0.19 272); /* accent as text */
+  --accent-soft: oklch(0.95 0.03 272); /* chips, highlight, soft buttons */
+  /* The drifting wash behind the page (body::before/::after). Decoration only:
+     it sits under opaque cards, so no figure ever reads against it. */
+  --wash-1: oklch(0.86 0.07 272 / 0.45);
+  --wash-2: oklch(0.88 0.06 200 / 0.35);
+  --wash-3: oklch(0.9 0.05 330 / 0.3);
+  --selected-row: oklch(0.97 0.02 272); /* with inset 3px 0 0 var(--accent) */
+
+  /* status -- ONLY on track / watch / over */
+  --ok: oklch(0.64 0.15 150);
+  --ok-text: oklch(0.4 0.11 150);
+  --ok-soft: oklch(0.95 0.05 150);
+  --watch: oklch(0.79 0.15 80);
+  --watch-text: oklch(0.45 0.1 70);
+  --watch-soft: oklch(0.95 0.06 85);
+  --over: oklch(0.6 0.2 25);
+  --over-text: oklch(0.45 0.16 25);
+  --over-soft: oklch(0.95 0.04 25);
+
+  /* data -- ONLY money in vs money out */
+  --money-in: oklch(0.66 0.11 190);
+  --money-in-text: oklch(0.47 0.09 190);
+  --money-in-selected: oklch(0.52 0.11 190);
+  --money-out: #b9bbc1; /* deliberately quiet */
+  --money-out-selected: #6f7178;
+
+  /* neutral series: stacked bars that are neither in/out nor status */
+  --series-1: #141518;
+  --series-2: #6f7178;
+  --series-3: #b9bbc1;
+  --series-4: #dcdcd8;
+  --chart-ghost: #d4d5d9; /* last month's line on the Home hero */
+  --chart-area: rgba(20, 21, 24, 0.05);
+
+  --tip-bg: #141518;
+  --tip-ink: #ffffff;
+  --tip-ink-2: #c4c5ca;
+  --appbar-blur-bg: rgba(245, 245, 243, 0.92);
+
+  /* ---- motion and focus (not colours, so not per theme) ---- */
+  --step: 150ms cubic-bezier(0.2, 0, 0.2, 1);
+  --ring: 0 0 0 3px var(--accent-soft);
+  --focus-outline: 2px solid var(--accent);
+  --focus-offset: 3px;
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f7178' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+  /* ======================================================================
+     Legacy layer -- Organic names pointed at v2. Every value is a var() of a
+     v2 token, so it follows the theme without its own dark copy.
+     ====================================================================== */
+  --surface-0: var(--bg);
+  --surface-1: var(--surface);
+  --surface-2: var(--pill);
+  --surface-3: var(--track);
+  --border: var(--line);
+  --border-strong: color-mix(in srgb, var(--ink) 18%, transparent);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-2);
+  --text-muted: var(--ink-3);
+  --accent-hover: color-mix(in srgb, var(--accent) 88%, var(--ink));
+  --accent-active: color-mix(in srgb, var(--accent) 78%, var(--ink));
+  --accent-contrast: var(--accent-ink);
+  --accent-2: var(--money-in);
+  --accent-2-hover: var(--money-in-selected);
+  --accent-2-soft: var(--pill);
+  --grid: var(--line);
+  --good: var(--ok-text);
+  --bad: var(--over-text);
+  --font-heading: var(--font-sans);
+  --font-body: var(--font-sans);
+  --font-heading-weight: 500;
+  --radius-sm: 8px;
+  --radius: var(--r-field);
+  --radius-lg: var(--r-card);
+  --radius-card: var(--r-card);
+  --radius-pill: var(--r-pill);
+  --shadow-sm: var(--shadow);
+  --shadow-lg: 0 12px 32px rgba(20, 21, 24, 0.14);
+  --sidebar-w: 240px;
+  --appbar-h: 56px;
+
+  /* Organic's ramps: the accent ramp now walks indigo, sage walks teal (it
+     only ever meant money in), neutral walks the greys. */
+  --neutral-100: var(--pill);
+  --neutral-300: var(--line);
+  --neutral-400: var(--grip);
+  --neutral-500: var(--ink-3);
+  --neutral-600: var(--ink-3);
+  --neutral-700: var(--ink-2);
+  --neutral-900: var(--ink);
+  --accent-200: var(--accent-soft);
+  --accent-300: var(--accent);
+  --accent-400: var(--accent);
+  --accent-500: var(--accent);
+  --accent-600: var(--accent-text);
+  --accent-700: var(--accent-text);
+  --accent-900: var(--accent-text);
+  --sage-200: var(--pill);
+  --sage-300: var(--money-in);
+  --sage-400: var(--money-in);
+  --sage-500: var(--money-in);
+  --sage-600: var(--money-in-text);
+  --sage-700: var(--money-in-text);
+
+  --color-page: var(--bg);
+  --color-surface: var(--surface);
+  --color-chrome: var(--bg);
+  --color-border: var(--line);
+  --color-border-strong: var(--border-strong);
+  --color-border-outline: var(--border-strong);
+  --color-row-divider: var(--line);
+  --color-border-frame: var(--line);
+  --color-text: var(--ink);
+  --color-text-2: var(--ink-2);
+  --color-muted: var(--ink-3);
+  --color-faint: var(--grip);
+  --color-mask: var(--track);
+  --color-track: var(--track);
+  --color-usage: var(--series-3);
+  --color-loose-stripe: var(--pill);
+  --color-inset: var(--pill);
+  --color-accent: var(--accent);
+  --color-accent-100: var(--accent-soft);
+  --color-accent-700: var(--accent-text);
+  --color-accent-800: var(--accent-text);
+  --color-sage: var(--money-in);
+  --color-sage-100: var(--pill);
+  --color-sage-700: var(--money-in-text);
+  --color-sage-900: var(--ink);
+  --color-sage-light: var(--money-in);
+  --color-chip-neutral-fg: var(--ink-2);
+  --color-on-accent: var(--accent-ink);
+  --color-dark: var(--ink);
+  --color-knob: var(--surface);
+  --color-input-bg: var(--field);
+  --color-input-border: var(--line);
+  --color-placeholder: var(--ink-3);
+  --color-on-primary: var(--accent-ink);
+  --color-logo-from: var(--ink);
+  --color-logo-to: var(--ink);
+  --color-rule: var(--line);
+  --color-out-1: var(--series-1);
+  --color-out-2: var(--series-2);
+  --color-out-3: var(--series-3);
+  --color-out-4: var(--series-4);
+  --color-out-5: var(--track);
+  --color-out-more: var(--track);
+
+  --type-page-title: var(--fs-title);
+  --type-page-title-phone: var(--fs-title);
+  --leading-title: 1.15;
+  --type-card-title: 20px;
+  --type-card-title-sm: 18px;
+  --type-button-display: 16px;
+  --type-row-title: var(--fs-body);
+  --type-row-title-sm: var(--fs-small);
+  --type-body: var(--fs-small);
+  --leading-body: 1.5;
+  --type-meta: var(--fs-meta);
+  --type-meta-sm: var(--fs-caption);
+  --type-chip: var(--fs-caption);
+  --type-chip-sm: var(--fs-caption);
+  --type-tag: var(--fs-label);
+  --type-tag-sm: var(--fs-label);
+  --type-eyebrow: var(--fs-label);
+  --tracking-eyebrow: var(--ls-label);
+  --mask-h-headline: 40px;
+
+  --radius-frame: var(--r-card);
+  --radius-summary-card: var(--r-card);
+  --radius-list-card: var(--r-card);
+  --radius-tile: var(--r-tile);
+  --radius-tile-lg: var(--r-tile);
+  --radius-code: 8px;
+  --radius-mask-sm: 5px;
+  --radius-mask: 9px;
+  --radius-phone-frame: var(--r-phone-sheet);
+
+  --pad-content-top: 40px;
+  --pad-content-x: 40px;
+  --pad-content-bottom: 56px;
+  --gap-section: 24px;
+  --gap-card-grid: 16px;
+  --gap-card-grid-lg: 16px;
+  --pad-summary-card: 24px;
+  --pad-list-card: 20px;
+  --pad-row-y: 14px;
+  --pad-phone-x: 16px;
+  --gap-phone-cards: 24px;
+  --pad-phone-card: 16px;
+  --shadow-card: var(--shadow);
+  --shadow-phone-frame: var(--shadow);
+}
+
+/* Dark, for the OS setting. Keep in step with the block after it. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) {
+    color-scheme: dark;
+
+    --bg: #0c0d10;
+    --surface: #16171b;
+    --surface-sheet: #1b1c21;
+    --sheet-card: #22232a;
+    --panel: #131418;
+    --line: #2a2b31;
+    --ink: #f3f3f5;
+    --ink-2: #b4b6bd;
+    --ink-3: #90939a;
+    --pill: #22232a;
+    --track: #26272d;
+    --field: #0c0d10;
+    --grip: #3a3c43;
+    --toggle-off: #3a3c43;
+    --scrim: rgba(0, 0, 0, 0.6);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --nav-on: #f3f3f5;
+    --nav-on-ink: #0c0d10;
+
+    --accent: oklch(0.7 0.15 272);
+    --accent-ink: #0c0d10;
+    --accent-text: oklch(0.76 0.13 272);
+    --accent-soft: oklch(0.28 0.06 272);
+    --wash-1: oklch(0.42 0.12 272 / 0.35);
+    --wash-2: oklch(0.4 0.08 200 / 0.25);
+    --wash-3: oklch(0.38 0.08 330 / 0.22);
+    --selected-row: oklch(0.24 0.04 272);
+
+    --ok: oklch(0.74 0.16 150);
+    --ok-text: oklch(0.82 0.14 150);
+    --ok-soft: oklch(0.32 0.06 150);
+    --watch: oklch(0.85 0.14 85);
+    --watch-text: oklch(0.88 0.12 85);
+    --watch-soft: oklch(0.34 0.06 85);
+    --over: oklch(0.7 0.17 25);
+    --over-text: oklch(0.82 0.11 25);
+    --over-soft: oklch(0.33 0.07 25);
+
+    --money-in: oklch(0.76 0.11 190);
+    --money-in-text: oklch(0.8 0.1 190);
+    --money-in-selected: oklch(0.84 0.11 190);
+    --money-out: #55585f;
+    --money-out-selected: #9a9da5;
+
+    --series-1: #f3f3f5;
+    --series-2: #9a9da5;
+    --series-3: #55585f;
+    --series-4: #34363c;
+    --chart-ghost: #3a3c43;
+    --chart-area: rgba(243, 243, 245, 0.06);
+
+    --tip-bg: #f3f3f5;
+    --tip-ink: #0c0d10;
+    --tip-ink-2: #4a4c52;
+    --appbar-blur-bg: rgba(12, 13, 16, 0.92);
+
+    --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2390939a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+  }
+}
+
+/* Dark, chosen explicitly in Settings. Keep in step with the block above. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0c0d10;
+  --surface: #16171b;
+  --surface-sheet: #1b1c21;
+  --sheet-card: #22232a;
+  --panel: #131418;
+  --line: #2a2b31;
+  --ink: #f3f3f5;
+  --ink-2: #b4b6bd;
+  --ink-3: #90939a;
+  --pill: #22232a;
+  --track: #26272d;
+  --field: #0c0d10;
+  --grip: #3a3c43;
+  --toggle-off: #3a3c43;
+  --scrim: rgba(0, 0, 0, 0.6);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --nav-on: #f3f3f5;
+  --nav-on-ink: #0c0d10;
+
+  --accent: oklch(0.7 0.15 272);
+  --accent-ink: #0c0d10;
+  --accent-text: oklch(0.76 0.13 272);
+  --accent-soft: oklch(0.28 0.06 272);
+  --wash-1: oklch(0.42 0.12 272 / 0.35);
+  --wash-2: oklch(0.4 0.08 200 / 0.25);
+  --wash-3: oklch(0.38 0.08 330 / 0.22);
+  --selected-row: oklch(0.24 0.04 272);
+
+  --ok: oklch(0.74 0.16 150);
+  --ok-text: oklch(0.82 0.14 150);
+  --ok-soft: oklch(0.32 0.06 150);
+  --watch: oklch(0.85 0.14 85);
+  --watch-text: oklch(0.88 0.12 85);
+  --watch-soft: oklch(0.34 0.06 85);
+  --over: oklch(0.7 0.17 25);
+  --over-text: oklch(0.82 0.11 25);
+  --over-soft: oklch(0.33 0.07 25);
+
+  --money-in: oklch(0.76 0.11 190);
+  --money-in-text: oklch(0.8 0.1 190);
+  --money-in-selected: oklch(0.84 0.11 190);
+  --money-out: #55585f;
+  --money-out-selected: #9a9da5;
+
+  --series-1: #f3f3f5;
+  --series-2: #9a9da5;
+  --series-3: #55585f;
+  --series-4: #34363c;
+  --chart-ghost: #3a3c43;
+  --chart-area: rgba(243, 243, 245, 0.06);
+
+  --tip-bg: #f3f3f5;
+  --tip-ink: #0c0d10;
+  --tip-ink-2: #4a4c52;
+  --appbar-blur-bg: rgba(12, 13, 16, 0.92);
+
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2390939a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  /* Rows and inputs are 16 in v2; meta 14, captions 13. */
+  font: 400 16px/1.5 var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  /* Nothing in a money app should need to scroll sideways. */
+  overflow-x: hidden;
+}
+
+/* html paints --bg; body stays clear so the wash below can sit between them. */
+body {
+  background: transparent;
+}
+
+/* A slow, soft gradient drifting behind everything. Two oversized layers of
+   radial gradients moved by transform only (compositor work, no repaint), on
+   different periods so the pattern never visibly loops. */
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: -30%;
+  z-index: -1;
+  pointer-events: none;
+  will-change: transform;
+}
+body::before {
+  background:
+    radial-gradient(closest-side at 30% 35%, var(--wash-1), transparent),
+    radial-gradient(closest-side at 70% 65%, var(--wash-2), transparent);
+  animation: wash-a 48s ease-in-out infinite alternate;
+}
+body::after {
+  background: radial-gradient(closest-side at 60% 30%, var(--wash-3), transparent);
+  animation: wash-b 67s ease-in-out infinite alternate;
+}
+@keyframes wash-a {
+  0% { transform: translate(-6%, -4%) rotate(0deg) scale(1); }
+  50% { transform: translate(5%, 3%) rotate(25deg) scale(1.08); }
+  100% { transform: translate(-3%, 6%) rotate(-15deg) scale(0.96); }
+}
+@keyframes wash-b {
+  0% { transform: translate(8%, 4%) scale(1.05); }
+  50% { transform: translate(-6%, -5%) scale(0.92); }
+  100% { transform: translate(3%, -8%) scale(1.1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:not([class]) {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- shell ----------
+   The chrome itself (top bar, phone header, bottom bar, the content column)
+   lives in src/routes/+layout.svelte since v2. */
+
+/* The auth pages' logo runs from deep navy to green, which loses its leading
+   letters against a dark background; lifting it beats a second asset. */
+:root[data-theme='dark'] .wordmark img {
+  filter: brightness(1.45) saturate(1.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .wordmark img {
+    filter: brightness(1.45) saturate(1.05);
+  }
+}
+
+.wordmark {
+  margin: 0 0 var(--space-1);
+  line-height: 0;
+}
+
+.wordmark img {
+  height: 44px;
+  width: auto;
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+
+/* Page title: 28/500. */
+h1 {
+  font-size: var(--fs-title);
+  font-weight: 500;
+  letter-spacing: var(--ls-title);
+  line-height: 1.15;
+  margin: 0;
+}
+
+/* Pages not yet rebuilt still use h2 between cards. Rebuilt ones use
+   .section-label instead -- v2 never puts a heading inside a card. */
+h2 {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: var(--ls-title);
+  line-height: 1.2;
+  color: var(--ink);
+  margin: var(--space-6) 0 var(--space-3);
+}
+
+/* Small capitals above a card, never inside it; 10px above the card. */
+.section-label {
+  font-size: var(--fs-label);
+  font-weight: var(--fw-strong);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 0 4px;
+}
+
+/* Every money figure is weight 500, tabular, and a link to the rows behind it
+   (drillHref). Quiet at rest; the underline is the hover affordance. */
+.figure {
+  color: inherit;
+  font-weight: var(--fw-figure);
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+}
+
+.figure:hover {
+  text-decoration: underline dotted var(--accent);
+  text-underline-offset: 5px;
+}
+
+.figure:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* In Advisor answers the figures are always underlined. */
+.figure--inline {
+  text-decoration: underline dotted var(--accent);
+  text-underline-offset: 4px;
+}
+
+/* ---------- surfaces ---------- */
+
+/* No border: v2 cards lift on --shadow alone. */
+.card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  padding: var(--space-5);
+  box-shadow: var(--shadow);
+}
+
+/* Every track here is floored at zero, and every child may shrink below its
+   content. A grid track's default minimum is the content's own width, so one
+   wide thing -- a chart, a row of tiles asking for two 200px columns -- would
+   widen the track, then the grid, then every card beside it, until the whole
+   page ran off the right edge of a phone and was clipped there. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.grid > * {
+  min-width: 0;
+}
+
+.tiles {
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+}
+
+.two-col {
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+}
+
+@media (max-width: 900px) {
+  .two-col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- stat tiles ---------- */
+
+.tile .label {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.tile .value {
+  font-size: 34px;
+  font-weight: var(--fw-figure);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-hero);
+  margin-top: var(--space-1);
+  line-height: 1.15;
+}
+
+.tile .delta {
+  font-size: 13px;
+  margin-top: var(--space-1);
+  color: var(--text-secondary);
+}
+
+.hero {
+  font-size: var(--fs-hero-phone);
+  font-weight: var(--fw-figure);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-hero);
+  line-height: 1.1;
+}
+
+.pos {
+  color: var(--good);
+}
+
+.neg {
+  color: var(--bad);
+}
+
+/* ---------- tables ---------- */
+
+/* A table too wide to fit scrolls inside its own box rather than pushing the
+   whole page sideways. */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover td {
+  background: var(--surface-2);
+}
+
+td.num,
+th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+/* ---------- bits ---------- */
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 4px;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* ---------- controls ---------- */
+
+button,
+.btn {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  /* 40px tall by default: a target you can hit on a phone without aiming. */
+  min-height: 40px;
+  padding: 0 var(--space-5);
+  /* Pills, per the system: nothing here draws a sharp corner. */
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-1);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition:
+    background var(--step),
+    border-color var(--step),
+    transform var(--step);
+}
+
+button:hover,
+.btn:hover {
+  background: var(--surface-2);
+}
+
+button:active,
+.btn:active {
+  transform: translateY(1px);
+}
+
+button.primary,
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+button.primary:hover,
+.btn.primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+button.danger {
+  color: var(--bad);
+  border-color: var(--border-strong);
+}
+
+button.danger:hover {
+  background: color-mix(in srgb, var(--bad) 12%, transparent);
+  border-color: var(--bad);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+}
+
+button.ghost,
+.btn.ghost {
+  border-color: transparent;
+  background: transparent;
+  padding: 0 var(--space-4);
+}
+
+button.ghost:hover,
+.btn.ghost:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  /* 16px on inputs specifically: anything smaller makes iOS zoom the page on
+     focus, and it never zooms back out. */
+  font-size: 16px;
+  min-height: 42px;
+  padding: 10px var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  background: var(--surface-1);
+  color: var(--text-primary);
+  width: 100%;
+  transition:
+    border-color var(--step),
+    box-shadow var(--step);
+}
+
+/* A select draws its own chevron. The native one is the operating system's --
+   a different arrow, weight and font on every platform, and it rendered the
+   closed control in the system face rather than Geist. The chevron is the
+   icon set's, as an image, in the muted text colour of each theme. */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 44px;
+  background-image: var(--select-chevron);
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px 16px;
+  cursor: pointer;
+}
+
+/* The file input keeps its native behaviour -- picking, drag-and-drop, the
+   accessible name -- and restyles only the button inside it, which was the
+   browser's grey rectangle. It takes the small outline button's values. */
+input[type='file'] {
+  padding: 5px 16px 5px 5px;
+  cursor: pointer;
+}
+
+input[type='file']::file-selector-button {
+  margin-right: 12px;
+  padding: 6px 14px;
+  border: 1px solid var(--color-border-outline);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--step);
+}
+
+input[type='file']::file-selector-button:hover {
+  background: var(--color-inset);
+}
+
+/* The one control that cannot be a pill: rounding a multi-line box to 999px
+   eats its own first and last lines. */
+textarea {
+  min-height: 90px;
+  line-height: 1.5;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+}
+
+input[type='color'] {
+  padding: 2px;
+  min-height: 42px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+input[type='checkbox'] {
+  width: auto;
+  min-height: 0;
+  accent-color: var(--accent);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+}
+
+button:focus-visible,
+.btn:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+label span.field {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-1);
+}
+
+.error {
+  color: var(--bad);
+  font-size: 14px;
+  padding: var(--space-3) var(--space-4);
+  background: color-mix(in srgb, var(--bad) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--bad) 30%, transparent);
+  border-radius: var(--radius);
+}
+
+.toolbar {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ---------- login ---------- */
+
+.login-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-5) var(--space-4);
+}
+
+form.login {
+  width: 100%;
+  max-width: 380px;
+  display: grid;
+  gap: var(--space-4);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--space-6);
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 760px) {
+  .card {
+    padding: var(--space-4);
+  }
+
+  /* Secondary columns are dropped rather than squeezed: five columns on a
+     390px screen is unreadable however it is styled. */
+  th.hide-sm,
+  td.hide-sm {
+    display: none;
+  }
+
+  th,
+  td {
+    padding: var(--space-3);
+  }
+
+  .page-head {
+    margin-bottom: var(--space-4);
+  }
+
+  h1 {
+    font-size: 28px;
+  }
+
+  h2 {
+    font-size: 19px;
+    margin: var(--space-5) 0 var(--space-3);
+  }
+}
+
+/* --- "Hide the numbers" -------------------------------------------------- */
+
+/* Every currency figure on screen is wrapped in `.amt`, including the text
+   inside charts, so one attribute on <html> hides all of them at once. The
+   attribute is written server-side from a cookie, which is why a masked session
+   never flashes the real numbers before JavaScript loads.
+
+   v2 replaces the figure with the literal "$•••", the same width whatever
+   the amount, so a masked figure never reveals how many digits it has. The
+   box is a fixed width in its own font size, the real text is pushed out of
+   it and clipped, and the mask is drawn in its place. It stays a link: the
+   element is still there, only its glyphs are swapped. */
+html[data-hide-amounts] .amt {
+  display: inline-block;
+  position: relative;
+  /* "$•••" in Geist measures 1.56em at 400, 1.63 at 500, 1.69 at 600. */
+  width: 1.7em;
+  overflow: clip;
+  white-space: nowrap;
+  text-indent: 3em;
+  vertical-align: bottom;
+  user-select: none;
+}
+
+html[data-hide-amounts] .amt::before {
+  content: '$•••';
+  position: absolute;
+  left: 0;
+  top: 0;
+  text-indent: 0;
+}
+
+/* CSS cannot replace SVG text, so chart labels blur until their charts are
+   rebuilt; strings built in JavaScript use maskedMoney(), which returns the
+   same "$•••". */
+html[data-hide-amounts] text.amt,
+html[data-hide-amounts] tspan.amt {
+  display: inline;
+  width: auto;
+  text-indent: 0;
+  filter: blur(4px);
+}
+
+/* Hovering a masked figure must not reveal it -- a native title tooltip is
+   plain text and cannot be masked by CSS, so those strings are masked in the
+   markup instead (see $lib/privacy.svelte.ts). */
+html[data-hide-amounts] .amt * {
+  pointer-events: none;
+}
+
+.privacy-on {
+  color: var(--accent);
+}
+
+/* A row of form controls that becomes a column when there is no room, rather
+   than a row of unusably narrow ones. */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+  align-items: end;
+}
+
+/* Cards lift slightly under the pointer. Small, but it is the difference
+   between a surface and a picture of one. */
+.card {
+  transition:
+    box-shadow var(--step),
+    transform var(--step),
+    border-color var(--step);
+}
+
+.card:hover {
+  box-shadow: var(--shadow);
+}
+
+/* Icons inside buttons should not be stretched by flex. */
+button svg,
+.btn svg {
+  flex: none;
+}
+
+/* ---------- list rows ----------
+   The dashboard's avatar list, shared so every ledger-shaped page reads the
+   same way. `.row` is only styled inside `.rows`: settings and the tour use a
+   bare `.row` of their own, and a global one would hand them its borders. */
+
+.group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--space-4) 0 var(--space-2);
+  border-top: 1px solid var(--border);
+}
+
+.group-head:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.group-total {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+.rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rows > .row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.rows > li:last-child {
+  border-bottom: 0;
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.row-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.row-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- phone ----------
+   Stat tiles: stacked full-width, each one was a screen-third of scroll for a
+   single number. On a phone they become one line each -- what it is on the
+   left, the figure on the right -- which is how a figure is read on a phone
+   anyway. Any icon a page adds to a tile is dropped with it. */
+@media (max-width: 760px) {
+  /* One tile per row: a one-line tile is label left, figure right, and three
+     of them side by side at 700px squeezed each label into a column. */
+  .tiles {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+
+  .card.tile {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-3);
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .tile .label {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .tile .delta {
+    grid-column: 1;
+    grid-row: 2;
+    margin-top: 2px;
+    font-size: 12px;
+  }
+
+  .tile .value {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin-top: 0;
+    font-size: 26px;
+    text-align: right;
+    white-space: nowrap;
+  }
+}
+
+/* A table that opts in with `stack-sm` stops being a table on a phone: each
+   row becomes one line -- its first cell takes the room, the figure or actions
+   hold the right edge, and anything too long wraps underneath instead of
+   pushing the table off the screen. Opt-in, because a genuinely tabular view
+   (the CSV import preview) is better scrolled sideways than restacked. */
+@media (max-width: 760px) {
+  table.stack-sm,
+  table.stack-sm tbody {
+    display: block;
+  }
+
+  table.stack-sm thead {
+    display: none;
+  }
+
+  table.stack-sm tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border);
+  }
+
+  table.stack-sm tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  table.stack-sm td {
+    display: block;
+    padding: 0;
+    border: 0;
+    width: auto !important;
+  }
+
+  /* Outranks .hide-sm on specificity, so it has to say it again. */
+  table.stack-sm td.hide-sm {
+    display: none;
+  }
+
+  /* Shrinks to 8rem before anything wraps: the actions beside it are short,
+     and a row that fits on one line should stay on one. */
+  table.stack-sm td:first-child {
+    flex: 1 1 8rem;
+    min-width: 0;
+  }
+
+  table.stack-sm td.num {
+    margin-left: auto;
+  }
+
+  table.stack-sm td[colspan] {
+    flex-basis: 100%;
+  }
+
+  table.stack-sm tbody tr:hover td {
+    background: none;
+  }
+}
+
+/* ---------- handoff page frame ----------
+   Pages rebuilt from the Organic handoff opt in with `hf-page` on their root.
+   Since v2 they sit in the layout's 1200px column like everything else. */
+.hf-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-section);
+  color: var(--color-text);
+}
+
+.hf-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  line-height: normal;
+}
+
+.hf-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: var(--type-page-title);
+  line-height: var(--leading-title);
+  letter-spacing: 0;
+}
+
+.hf-lede {
+  margin: 6px 0 0;
+  font-size: var(--type-body);
+  color: var(--color-muted);
+}
+
+@media (max-width: 760px) {
+  .hf-title {
+    font-size: var(--type-page-title-phone);
+  }
+}

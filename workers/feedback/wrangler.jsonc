@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "howtomoney-feedback",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-01-01",
+  // Cloudflare Email Routing. No fixed destination: help reports go to
+  // RECIPIENT and connection alerts to the user they concern. Cloudflare will
+  // only deliver to addresses verified under Email -> Email Routing ->
+  // Destination addresses, which is what stops this being an open relay --
+  // a second household's address has to be verified there before it gets mail.
+  "send_email": [{ "name": "SEND_EMAIL" }],
+  // The email icons, public at /email/*.png (src/lib/email.ts EMAIL_ASSET_BASE).
+  // A matching file is served before the Worker runs, so no secret is needed;
+  // everything else still reaches fetch() below.
+  "assets": { "directory": "./public" },
+  // Last heartbeat, and whether "down" has been mailed for this outage.
+  "kv_namespaces": [{ "binding": "STATE", "id": "<your-kv-namespace-id>" }],
+  // The dead-man check: mails RECIPIENT when heartbeats stop.
+  "triggers": { "crons": ["*/30 * * * *"] },
+  "vars": {
+    // Any address on a zone with Email Routing enabled. It does not need a
+    // mailbox -- nothing replies to it.
+    "SENDER": "alerts@example.com",
+    "RECIPIENT": "you@example.com",
+    "DOWN_AFTER_HOURS": "3",
+    // Where the buttons in its own emails go.
+    "APP_URL": "https://money.example.com"
+  }
+  // SHARED_SECRET is set with:  wrangler secret put SHARED_SECRET
+}

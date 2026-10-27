@@ -1,0 +1,1 @@
+ALTER TABLE "accounts" ADD COLUMN "interest_rate" numeric(6, 3);

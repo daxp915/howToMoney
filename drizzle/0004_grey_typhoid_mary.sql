@@ -1,0 +1,1 @@
+ALTER TABLE "merchants" ADD COLUMN "is_subscription" boolean DEFAULT false NOT NULL;

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f5f3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0c0d10" media="(prefers-color-scheme: dark)" />
+    <!-- "Add to Home Screen" opens it full-screen like an app, with no browser
+         bars (Android reads the manifest; iOS reads the apple-* tags). -->
+    <link rel="manifest" href="%sveltekit.assets%/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="HTMFD" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="icon" type="image/png" sizes="32x32" href="%sveltekit.assets%/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="%sveltekit.assets%/favicon-48.png" />
+    <!-- Opaque cream ground: iOS renders a transparent touch icon on black. -->
+    <link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.png" />
+    <!-- Geist is the only face, served from this origin (see the @font-face
+         block in app.css), not from fonts.googleapis.com: this runs on a NAS
+         that may have no route out, and a blocked font stylesheet silently
+         renders the app in the system face. Preloaded because every hero
+         figure is set in it, and a late swap is the one FOUT that moves layout. -->
+    <link rel="preload" href="/fonts/geist-variable.woff2" as="font" type="font/woff2" crossorigin />
+    <script nonce="%sveltekit.nonce%">
+      // Applied before first paint so a stored theme doesn't flash the other one.
+      // Wrapped because storage throws in some privacy modes. The nonce is what
+      // lets it past `script-src 'self'`; without it the CSP blocks it and a
+      // saved Light/Dark choice is silently ignored on every load.
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>

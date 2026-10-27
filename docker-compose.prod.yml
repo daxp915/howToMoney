@@ -1,0 +1,49 @@
+# Production overlay for the NAS.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Adds the Cloudflare tunnel. Deliberately publishes no ports: the base stack
+# exposes nothing, so the tunnel is the only route in and nothing is reachable
+# from the LAN or the internet directly. cloudflared connects outbound, so the
+# router needs no port forward.
+services:
+  # The Sentry token for source-map upload, as a build secret: mounted only
+  # while `npm run build` runs, never printed, never in a layer. The file lives
+  # on the NAS only (.secrets/ is git- and docker-ignored).
+  web:
+    build:
+      context: .
+      secrets: [sentry_auth_token]
+  worker:
+    build:
+      context: .
+      secrets: [sentry_auth_token]
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    depends_on:
+      - web
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+
+  # Daily pg_dump, encrypted to a public key, 30 days kept in ./backups.
+  # backup/README.md has the restore. ./backups must exist (DSM won't create
+  # bind-mount directories).
+  backup:
+    build: ./backup
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./backups:/backups
+
+secrets:
+  sentry_auth_token:
+    file: ./.secrets/sentry_auth_token

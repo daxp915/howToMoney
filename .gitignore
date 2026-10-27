@@ -1,0 +1,34 @@
+node_modules
+.svelte-kit
+build
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+backups/
+data/
+.env.test
+# Written by the deploy (git sha), read by the image build for Sentry.
+RELEASE
+
+Screenshot*.png
+*.png
+# ...but the app's own images ship with it. assets/ holds the large originals.
+!static/*.png
+
+# README screenshots (demo data only)
+!docs/screenshots/*.png
+# Email icons, served by the relay Worker
+!workers/feedback/public/email/*.png
+
+# Playwright: the saved demo sign-in, reports and failure traces
+e2e/.auth/
+playwright-report/
+test-results/
+# Wrangler local state
+.wrangler/
+.secrets/
+
+# Backup encryption certificate: generate your own (see backup/README.md)
+backup/*.crt

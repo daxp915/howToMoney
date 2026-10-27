@@ -1,0 +1,21 @@
+# Weekly pull requests for outdated or vulnerable dependencies. CI runs on
+# each one, so a bump that breaks the app shows up red before anyone merges it.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    groups:
+      # Minor and patch bumps arrive as one PR instead of a dozen.
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  # Also moves the workflows off actions that GitHub has deprecated
+  # (the Node 20 warnings on every CI run).
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly, day: monday }
+    groups:
+      actions:
+        patterns: ['*']
