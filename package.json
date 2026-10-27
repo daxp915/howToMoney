@@ -44,7 +44,7 @@
     "@node-rs/argon2": "^2.0.2",
     "@sentry/node": "^11.7.0",
     "@sentry/sveltekit": "^11.7.0",
-    "@sveltejs/adapter-node": "^5.2.12",
+    "@sveltejs/adapter-node": "^6.0.0",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.45.4",
     "otpauth": "^9.3.6",
